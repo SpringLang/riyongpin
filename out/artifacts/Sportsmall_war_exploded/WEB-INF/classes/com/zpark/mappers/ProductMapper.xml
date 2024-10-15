@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zpark.dao.ProductDao">
+
+    <resultMap type="Product" id="ProductResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="stock" column="stock"/>
+        <result property="proPic" column="proPic"/>
+        <result property="description" column="description"/>
+        <result property="hot" column="hot"/>
+        <result property="hotTime" column="hotTime"/>
+        <result property="specialPrice" column="specialPrice"/>
+        <result property="specialPriceTime" column="specialPriceTime"/>
+
+        <!-- 通过根据商品大类id查找商品大类，关联商品大类 -->
+        <association property="bigType" column="bigTypeId"
+                     select="com.zpark.dao.ProductBigTypeDao.findProductBigTypeByBigTypeId"></association>
+        <!-- 通过根据商品小类id查找商品小类，关联商品小类 -->
+        <association property="smallType" column="smallTypeId"
+                     select="com.zpark.dao.ProductSmallTypeDao.findProductSmallTypeBySmallTypeId"></association>
+    </resultMap>
+
+
+    <select id="getProductById" parameterType="Integer" resultMap="ProductResult">
+        select *
+        from t_product
+        where id = #{id}
+    </select>
+
+
+    <select id="findProductList" parameterType="Map" resultMap="ProductResult">
+        select * from t_product
+        <where>
+            <if test="bigTypeId != null and bigTypeId != ''">
+                and bigTypeId = #{bigTypeId}
+            </if>
+            <if test="smallTypeId != null and smallType != ''">
+                and smallTypeId = #{smallTypeId}
+            </if>
+            <if test="name != null and name != ''">
+                <!--  and name like #{name}-->
+                and name like '%${name}%'
+            </if>
+            <if test="specialPrice == 1">
+                and specialPrice=1 order by specialPriceTime desc
+            </if>
+            <if test="hot == 1">
+                and hot=1 order by hotTime desc
+            </if>
+        </where>
+
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="getProductCount" parameterType="Map" resultType="Long">
+        select count(*) from t_product
+        <where>
+            <if test="bigTypeId != null">
+                bigTypeId = #{bigTypeId}
+            </if>
+            <if test="smallTypeId != null and smallType != ''">
+                and smallTypeId = #{smallTypeId}
+            </if>
+            <if test="name != null and name != ''">
+                <!--  and name like #{name}-->
+                and name like '%${name}%'
+            </if>
+        </where>
+    </select>
+
+    <insert id="saveProduct" parameterType="Product">
+        insert into t_product
+        values (null, #{description}, 0, #{hotTime}, #{name}, #{price}, #{proPic}, 0, #{specialPriceTime}, #{stock},
+                #{bigType.id}, #{smallType.id})
+    </insert>
+
+    <update id="updateProduct" parameterType="Product">
+        update t_product
+        set description=#{description},
+            hot=#{hot},
+            hotTime=#{hotTime},
+            name=#{name},
+            price=#{price},
+            proPic=#{proPic},
+            specialPrice=#{specialPrice},
+            specialPriceTime=#{specialPriceTime},
+            stock=#{stock},
+            bigTypeId=#{bigType.id},
+            smallTypeId=#{smallType.id}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProduct" parameterType="Integer">
+        delete
+        from t_product
+        where id = #{id}
+    </delete>
+
+    <update id="setProductWithSpecialPrice" parameterType="Integer">
+        update t_product
+        set specialPrice     = 1,
+            specialPriceTime = now()
+        where id = #{id}
+    </update>
+    <update id="delProductWithSpecialPrice" parameterType="Integer">
+        update t_product
+        set specialPrice     = 0
+        where id = #{id}
+    </update>
+
+    <update id="setProductWithHot" parameterType="Integer">
+        update t_product
+        set hot     = 1,
+            hotTime = now()
+        where id = #{id}
+    </update>
+    <update id="delProductWithHot" parameterType="Integer">
+        update t_product
+        set hot     = 0
+        where id = #{id}
+    </update>
+
+    <select id="existProductWithSmallTypeId" parameterType="Integer" resultType="Integer">
+        select count(*)
+        from t_product
+        where smallTypeId = #{smallTypeId}
+    </select>
+</mapper> 

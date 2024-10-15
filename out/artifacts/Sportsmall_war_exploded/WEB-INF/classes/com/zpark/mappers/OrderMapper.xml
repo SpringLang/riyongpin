@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zpark.dao.OrderDao">
+
+	<resultMap type="Order" id="OrderResult">
+		<result property="id" column="id" />
+		<result property="cost" column="cost" />
+		<result property="createTime" column="createTime" />
+		<result property="orderNo" column="orderNo" />
+		<result property="status" column="status" />
+
+		<association property="user" column="userId" select="com.zpark.dao.UserDao.getUserById"></association>
+		
+		<collection property="orderProductList" column="id" javaType="ArrayList"
+                    ofType="com.zpark.entity.OrderProduct" select="com.zpark.dao.OrderProductDao.getOrderProductByOrderId">
+			<result property="id" column="id" />
+			<result property="num" column="num" />
+		</collection>
+		
+	</resultMap>
+	
+	<insert id="saveOrder" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
+		insert into t_order values(null,#{cost},now(),#{orderNo},1,#{user.id})
+	</insert>
+
+	<insert id="saveOrderProduct" parameterType="List" >
+		INSERT INTO t_order_product(num,orderId,productId) values
+		<foreach collection="list" item="item" separator=",">  
+			(#{item.num},#{item.order.id},#{item.product.id})  
+		</foreach>  
+	</insert>
+	
+	<select id="findOrder" parameterType="Map" resultMap="OrderResult">
+		select * from t_order o,t_user u
+		<where>
+			o.userId = u.id 
+			<if test="order != null">
+				<if test="orderUser != null and orderUserId != 0">
+					and o.userId = #{orderUserId}
+				</if>
+			</if>
+			<if test="orderNo != null and orderNo != '' ">
+			   and o.orderNo like '%${orderNo}%'
+			</if>
+			<if test="userName != null and userNmae != '' ">
+				and u.userName like '%${userName}%'
+			</if>
+		</where>
+		order by createTime desc
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+
+	<update id="updateOrderStatus" parameterType="Map">
+		update t_order set status = #{status} where orderNo = #{orderNo}
+	</update>
+	
+	<select id="getOrderCount" parameterType="Map" resultType="Long">
+		select count(*) from t_order o,t_user u
+		<where>
+			o.userId = u.id
+			<if test="order != null">
+				<if test="orderUser != null and orderUserId != 0">
+					o.userId = #{orderUserId}
+				</if>
+			</if>
+			<if test="orderNo != null and orderNo != '' ">
+			   and o.orderNo like '%${orderNo}%'
+			</if>
+			<if test="userName != null and userNmae != '' ">
+				and u.userName like '%${userName}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="getOrderById" parameterType="Integer" resultMap="OrderResult">
+		select * from t_order where id = #{id}
+	</select>
+</mapper> 

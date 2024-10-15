@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/CommentController.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/DateJsonValueProcessor.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/FileLoad.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/NewsController.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/NoticeController.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/ObjectJsonValueProcessor.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/ProductBigTypeController.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/ProductController.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/ProductSmallTypeController.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/zpark/controller/ShoppingController.java" charset="GBK" />
+    <file url="PROJECT" charset="GBK" />
+  </component>
+</project>

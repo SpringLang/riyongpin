@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zpark.dao.ProductSmallTypeDao">
+
+	<resultMap type="ProductSmallType" id="ProductSmallTypeResult">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="remarks" column="remarks" />
+		
+		<!-- 通过根据商品大类id查找茶品大类，关联商品大类 -->
+		<association property="bigType" column="bigTypeId" select="com.zpark.dao.ProductBigTypeDao.findProductBigTypeByBigTypeId"></association>
+	</resultMap>
+	
+	<!-- 通过商品大类id查找商品小类，用于商品大类与商品小类双向一对多关联 -->
+	<select id="findSmallTypeByBigTypeId" parameterType="Integer" resultMap="ProductSmallTypeResult">
+		select * from t_smalltype where bigTypeId = #{id}
+	</select>
+
+	<!-- 根据条件查找商品小类list -->
+	<select id="findSmallTypeList" parameterType="Map" resultMap="ProductSmallTypeResult">
+		select * from t_smalltype
+		<where>
+			<if test="bigTypeId != null and bigTypeId != ''">
+				bigTypeId = #{bigTypeId}
+			</if>
+			<if test="smallTypeName != null and smallTypeName != ''">
+				and name like '%${smallTypeName}%'
+			</if>
+		</where>
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	
+	<!-- 通过商品小类id查找商品小类，用于商品与商品小类双向一对多关联 -->
+	<select id="findProductSmallTypeBySmallTypeId" parameterType="Integer" resultMap="ProductSmallTypeResult">
+		select * from t_smallType where id = #{id}
+	</select>
+	
+	<select id="existSmallTypeWithBigTypeId" parameterType="Integer" resultType="Long">
+		select count(*) from t_smallType where bigTypeId = #{bigTypeId}
+	</select>
+	
+	<select id="getProductSmallTypeCount" parameterType="Map" resultType="Long">
+		select count(*) from t_smallType
+		<where>
+			<if test="smallTypeName != null and smallTypeName != ''">
+				and name like '%${smallTypeName}%'
+			</if>
+		</where>
+	</select>
+	
+	<insert id="saveProductSmallType" parameterType="ProductSmallType">
+		insert into t_smallType values(null,#{name},#{remarks},#{bigType.id})
+	</insert>
+	
+	<update id="updateProductSmallType" parameterType="ProductSmallType">
+		update t_smallType set name = #{name},remarks = #{remarks},bigTypeId=#{bigType.id}
+	    where id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_smallType where id = #{id}
+	</delete>
+</mapper> 

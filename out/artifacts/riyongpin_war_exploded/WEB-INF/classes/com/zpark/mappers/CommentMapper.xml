@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zpark.dao.CommentDao">
+
+	<resultMap type="Comment" id="CommentResult">
+		<result property="id" column="id" />
+		<result property="content" column="content" />
+		<result property="nickName" column="nickName" />
+		<result property="createTime" column="createTime" />
+		<result property="replyContent" column="replyContent" />
+		<result property="replyTime" column="replyTime" />
+	</resultMap>
+	
+
+	<select id="findCommentList" parameterType="Map" resultMap="CommentResult">
+		select * from t_comment
+		<where>
+			<if test="content != null and content != ''">
+				content like '%${content}%'
+			</if>
+		</where>
+		order by createTime desc
+		<if test="start!=null and size!=null">
+			limit #{start},#{size}
+		</if>
+	</select>
+
+	<select id="getCommentCount" parameterType="Map" resultType="Long">
+		select count(*) from t_comment
+		<where>
+			<if test="content != null and content != ''">
+				content like '%${content}%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="saveComment" parameterType="Comment">
+		insert into t_comment values(null,#{content},now(),#{nickName},#{replyContent},#{replyTime})
+	</insert>
+	
+	<update id="saveReplyContent" parameterType="Comment">
+		update t_comment set content = #{content},replyContent = #{replyContent},replyTime = now() where id = #{id}
+	</update>
+	
+	<select id="getCommentById" parameterType="Integer" resultMap="CommentResult">
+		select * from t_comment where id = #{id}
+	</select>
+	
+	
+	<delete id="delete" parameterType="Integer">
+		delete from t_comment where id = #{id}
+	</delete>
+</mapper> 
